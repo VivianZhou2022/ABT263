@@ -1,0 +1,89 @@
+---
+title: "ABT263"
+author: "Qing Zhou"
+date: "11/8/2022"
+output: github_document
+---
+
+```{r, message = FALSE, eval = FALSE}
+library(tidyverse)
+library(lubridate)
+library(readxl)
+
+knitr::opts_chunk$set(
+	echo = TRUE,
+	warning = FALSE,
+	fig.width = 8, 
+  fig.height = 6,
+  out.width = "90%"
+)
+```
+
+```{r}
+ABT263 = 
+  read_csv("data/ABT263.csv")%>%
+  
+  pivot_longer(
+    vehicle_1:abt_5,
+    names_to = "drug",
+    values_to = "size") %>%
+ select(day, drug, size)%>%
+ separate(drug, into=c('drugs', 'mouse'), sep='_', remove = TRUE)
+```
+
+
+```{r}
+ABT263 %>% 
+  ggplot(aes(x = day, y = size, color = drugs)) +
+  geom_point(alpha = 0.5) + 
+  geom_smooth() + 
+  scale_x_continuous(limits = c(7,21))
+  labs(title = "Tumor Growth Curve ",
+    x = "Days After Implantation",
+    y = "Tumor Volume per mouse(mm3)" )
+```
+
+
+
+```{r}
+library("dplyr")
+
+abt = ABT263 %>%
+  group_by(day, drugs) %>% 
+  summarise(avg_size = mean(size))
+```
+
+```{r}
+abt %>%
+   mutate(
+    day =  as.factor(day)
+    ) %>%
+  
+  ggplot(aes(x = day, y = avg_size, fill = drugs)) +
+  geom_boxplot(fill = '#A4A4A4', color = "blue") +
+  
+  labs(
+      x = "Days After Implantation",
+      y = "Tumor Volume per mouse(mm3)",
+      title = "Tumor Volume per mouse(mm3)"
+    ) 
+
+```
+```{r}
+ABT263 %>%
+   mutate(
+    day =  as.factor(day)
+    ) %>%
+  
+  ggplot(aes(x = day, y = size, fill = drugs)) +
+  geom_smooth() + 
+  geom_boxplot(fill = '#A4A4A4', color = "blue") +
+  
+  labs(
+      x = "Days After Implantation",
+      y = "Tumor Volume per mouse(mm3)",
+      title = "Tumor Growth Curve"
+    ) 
+
+```
+
