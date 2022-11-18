@@ -9,6 +9,7 @@ output: github_document
 library(tidyverse)
 library(lubridate)
 library(readxl)
+library(dplyr)
 
 knitr::opts_chunk$set(
 	echo = TRUE,
@@ -21,14 +22,15 @@ knitr::opts_chunk$set(
 
 ```{r}
 ABT263 = 
-  read_csv("data/ABT263.csv")%>%
+  read_csv("data/ABT263.csv") %>%
   
   pivot_longer(
     vehicle_1:comin_5,
     names_to = "drug",
     values_to = "size") %>%
- select(day, drug, size)%>%
- separate(drug, into=c('drugs', 'mouse'), sep='_', remove = TRUE)
+ select(day, drug, size) %>%
+ separate(drug, into = c('drugs', 'mouse'), sep='_', remove = TRUE)
+ABT263
 ```
 
 
@@ -37,7 +39,7 @@ ABT263 %>%
   ggplot(aes(x = day, y = size, color = drugs)) +
   geom_point(alpha = 0.5) + 
   geom_smooth() + 
-  scale_x_continuous(limits = c(7,24))
+  scale_x_continuous(limits = c(7,24))+
   labs(title = "Tumor Growth Curve ",
     x = "Days After Implantation",
     y = "Tumor Volume per mouse(mm3)" )
@@ -56,7 +58,7 @@ ABT263 %>%
 
 
 ```{r}
-library("dplyr")
+
 
 abt = ABT263 %>%
   group_by(day, drugs) %>% 
